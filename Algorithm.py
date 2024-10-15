@@ -6,7 +6,22 @@
 # Imports
 import csv
 
-with open('records.csv', mode='r') as recordsCSV:
+tutorialList = []
+indexList = []
+schoolList = []
+nameList = []
+genderList = []
+gpaList = []
+
+with open('../records.csv', mode='r') as recordsCSV:
     records = csv.reader(recordsCSV)
     for line in records:
-        print(line)
+        tutorialList.append(line[0])
+        indexList.append(line[1])
+        schoolList.append(line[2])
+        nameList.append(line[3])
+        genderList.append(line[4])
+        gpaList.append(line[5])
+
+print(nameList)
+
