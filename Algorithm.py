@@ -29,7 +29,6 @@ def loadData(filename, studentsList):
         records = csv.DictReader(recordsCSV)
         
         for row in records:
-            tempData = row['Tutorial Group']
             studentsList.append(row)
 
 # sortStudents - 
