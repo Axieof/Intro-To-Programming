@@ -36,6 +36,10 @@ def sortStudents(sortList, studentsList):
     sortList = sorted(studentsList, key=extractNum)
     return sortList
 
+# getLastGroup - Gets the tutorial group num of the last group
+def getLastGroup(studentsList):
+    return int(studentsList[-1]['Tutorial Group'].split('-')[1])
+
 # genderSplit
 
 # schoolAffiliation
@@ -53,9 +57,22 @@ def mainProcess(pathToFile, studentsList, sortedStudentsList):
     # Step 2 - Sort based on Tutorial Group
     sortedStudents = sortStudents(sortedStudentsList, studentsList)
 
-    # Step 3 - 
+    # Step 3 - Get total number of tutorial groups
+    totalGroups = getLastGroup(sortedStudents)
 
     # Step 4 - 
+    for num in range(totalGroups):
+
+        currentList = []
+
+        for item in sortedStudents:
+            if int(item['Tutorial Group'].split('-')[1]) == num+1:
+                currentList.append(item)
+
+        
+
+        print(currentList)
+
 
     # Step 5 -
 
