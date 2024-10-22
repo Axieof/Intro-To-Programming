@@ -45,11 +45,20 @@ def sortStudents(sortList, studentsList):
 # exportData
 
 # mainProcess
+def mainProcess(pathToFile, studentsList, sortedStudentsList):
+
+    # Step 1 - Load CSV File
+    loadData(pathToFile, studentsList)
+
+    # Step 2 - Sort based on Tutorial Group
+    sortedStudents = sortStudents(sortedStudentsList, studentsList)
+
+    # Step 3 - 
+
+    # Step 4 - 
+
+    # Step 5 -
 
 
-loadData(pathToFile, Students)
-
-sortedStudents = sortStudents(sortedStudents, Students)
-
-for item in sortedStudents:
-    print(item)
+# Run Algorithm
+mainProcess(pathToFile, Students, sortedStudents)
