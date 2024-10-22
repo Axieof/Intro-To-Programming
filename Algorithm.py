@@ -3,20 +3,25 @@
 # Team 3
 # Tam, Nisha, Jerdel, Boris, Pritheev
 
+# ========
 # Imports
+# ========
 import csv
 
+# ======================
 # Variable Initialising
+# ======================
 Students = []
 sortedStudents = []
 pathToFile = '../records.csv'
 
+# ======================
+# Functions
+# ======================
+
 # extractNum - Extracts numerical part from tutorial group
 def extractNum(group):
     return int(group["Tutorial Group"].split('-')[1])
-
-# Initialising defaultdict variable
-tutorialGroup = defaultdict(list)
 
 # loadData - Reading raw csv data
 def loadData(filename, studentsList):
@@ -41,6 +46,8 @@ def sortStudents(sortList, studentsList):
 # exportData
 
 # mainProcess
+
+
 loadData(pathToFile, Students)
 
 sortedStudents = sortStudents(sortedStudents, Students)
