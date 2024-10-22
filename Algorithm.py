@@ -5,6 +5,7 @@
 
 # Imports
 import csv
+from collections import defaultdict
 
 # Variable Initialising
 tutorialList = []
@@ -14,27 +15,27 @@ nameList = []
 genderList = []
 gpaList = []
 Students = []
+pathToFile = '../records.csv'
+
+# extractNum - Extracts numerical part from tutorial group
+def extractNum(group):
+    return int(group.split('-')[1])
+
+# Initialising defaultdict variable
+tutorialGroup = defaultdict(list)
 
 # loadData - Reading raw csv data
-def loadData(filename, Students):
-    with open('records.csv', mode='r') as recordsCSV:
+def loadData(filename):
+    with open(filename, mode='r') as recordsCSV:
         records = csv.DictReader(recordsCSV)
-        for line in records:
-            student = {
-                'Tutorial Group': line['Tutorial Group'],
-                'Student': line['Student ID'],
-                'School': line['School'],
-                'Name': line['Name'],
-                'Gender': line['Gender'],
-                'CGPA': line['CGPA']
-            }
-            Students.append(student)
+        
+        for row in records:
+            tempData = row['Tutorial Group']
+            tutorialGroup[tempData].append(row)
 
-Students = loadData('records.csv', Students)
+
 
 # sortStudents - 
-
-# mainProcess
 
 # genderSplit
 
@@ -44,3 +45,7 @@ Students = loadData('records.csv', Students)
 
 # exportData
 
+# mainProcess
+loadData(pathToFile)
+
+print(tutorialGroup)
