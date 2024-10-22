@@ -5,7 +5,6 @@
 
 # Imports
 import csv
-from collections import defaultdict
 
 # Variable Initialising
 Students = []
@@ -47,4 +46,4 @@ loadData(pathToFile, Students)
 sortedStudents = sortStudents(sortedStudents, Students)
 
 for item in sortedStudents:
-    print(item['Tutorial Group'])
+    print(item)
