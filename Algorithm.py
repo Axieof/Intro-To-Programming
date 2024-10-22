@@ -6,22 +6,41 @@
 # Imports
 import csv
 
+# Variable Initialising
 tutorialList = []
 indexList = []
 schoolList = []
 nameList = []
 genderList = []
 gpaList = []
+Students = []
 
-with open('../records.csv', mode='r') as recordsCSV:
-    records = csv.reader(recordsCSV)
-    for line in records:
-        tutorialList.append(line[0])
-        indexList.append(line[1])
-        schoolList.append(line[2])
-        nameList.append(line[3])
-        genderList.append(line[4])
-        gpaList.append(line[5])
+# loadData - Reading raw csv data
+def loadData(filename, Students):
+    with open('records.csv', mode='r') as recordsCSV:
+        records = csv.DictReader(recordsCSV)
+        for line in records:
+            student = {
+                'Tutorial Group': line['Tutorial Group'],
+                'Student': line['Student ID'],
+                'School': line['School'],
+                'Name': line['Name'],
+                'Gender': line['Gender'],
+                'CGPA': line['CGPA']
+            }
+            Students.append(student)
 
-print(nameList)
+Students = loadData('records.csv', Students)
+
+# sortStudents - 
+
+# mainProcess
+
+# genderSplit
+
+# schoolAffiliation
+
+# currentCGPA
+
+# exportData
 
