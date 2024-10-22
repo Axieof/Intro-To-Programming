@@ -45,7 +45,7 @@ def genderSplit(studentlist):
     male_list = []
     female_list = []
     for student in studentlist:
-        if student["Gender"].strip() == "Male":
+        if student["Gender"]== "Male":
             male_list.append(student)
         else:
             female_list.append(student)
