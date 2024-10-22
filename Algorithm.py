@@ -41,7 +41,15 @@ def getLastGroup(studentsList):
     return int(studentsList[-1]['Tutorial Group'].split('-')[1])
 
 # genderSplit
-
+def genderSplit(studentlist):
+    male_list = []
+    female_list = []
+    for student in studentlist:
+        if student["Gender"].strip() == "Male":
+            male_list.append(student)
+        else:
+            female_list.append(student)
+    return male_list, female_list
 # schoolAffiliation
 
 # currentCGPA
@@ -68,6 +76,9 @@ def mainProcess(pathToFile, studentsList, sortedStudentsList):
         for item in sortedStudents:
             if int(item['Tutorial Group'].split('-')[1]) == num+1:
                 currentList.append(item)
+            
+        male_list,female_list=genderSplit(currentList)
+
 
         # Current List has 50 students from a tutorial group
         print(currentList)
