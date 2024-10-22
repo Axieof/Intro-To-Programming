@@ -69,9 +69,13 @@ def mainProcess(pathToFile, studentsList, sortedStudentsList):
             if int(item['Tutorial Group'].split('-')[1]) == num+1:
                 currentList.append(item)
 
+        # Current List has 50 students from a tutorial group
+        print(currentList)
+        
+        # Step 5 - Split by gender
         
 
-        print(currentList)
+        
 
 
     # Step 5 -
