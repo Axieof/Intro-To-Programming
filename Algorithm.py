@@ -1,7 +1,7 @@
 # Intro to computational thinking
 # Assignment 1
 # Team 3
-# Tham, Nisha, Jerdel, Boris, Pritheev
+# Tam, Nisha, Jerdel, Boris, Pritheev
 
 # Imports
 import csv
