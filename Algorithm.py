@@ -13,7 +13,7 @@ import csv
 # ======================
 Students = []
 sortedStudents = []
-pathToFile = '../records.csv'
+pathToFile = 'records.csv'
 
 # ======================
 # Functions
@@ -50,8 +50,33 @@ def genderSplit(studentlist):
         else:
             female_list.append(student)
     return male_list, female_list
-# schoolAffiliation
 
+# schoolAffiliation
+def schoolAffiliation(studentList):
+    schoolCount = {}
+    for student in studentList:
+        school = student['School']
+        if school in schoolCount:                       # counting the recurrence of different schools
+            schoolCount[school] += 1
+        else:
+            schoolCount[school] = 1
+                  
+    schoolCountList = list(schoolCount.items())
+    for i in range(len(schoolCountList)):
+        for j in range(i + 1, len(schoolCountList)):
+            if schoolCountList[i][1] < schoolCountList[j][1]:
+                schoolCountList[i], schoolCountList[j] = schoolCountList[j], schoolCountList[i]     # sorting by school with the highest frequency
+                
+    newStudentList = []
+    for tuples in schoolCountList:
+        school = tuples[0]
+        for student in studentList:
+            if student['School'] == school:
+                newStudentList.append(student)
+                
+    return newStudentList
+    
+                        
 # currentCGPA
 
 # exportData
@@ -78,10 +103,10 @@ def mainProcess(pathToFile, studentsList, sortedStudentsList):
                 currentList.append(item)
             
         male_list,female_list=genderSplit(currentList)
-
-
+        
+        newStudentList = schoolAffiliation(currentList)                 # List with the school frequency in descending order
         # Current List has 50 students from a tutorial group
-        print(currentList)
+        #print(currentList)
         
         # Step 5 - Split by gender
         
