@@ -7,17 +7,28 @@
 # Imports
 # ========
 import csv
+import tabulate
 
 # ======================
 # Variable Initialising
 # ======================
 Students = []
 sortedStudents = []
-pathToFile = 'records.csv'
+pathToFile = '../records.csv'
 
 # ======================
 # Functions
 # ======================
+
+# printList - Prints lists in table form
+def printList(dataset):
+    if dataset:
+        header = dataset[0].keys()
+        rows = [x.values() for x in dataset]
+
+        print(tabulate.tabulate(rows, header))
+    else:
+        print("Dataset is empty, cannot tabulate")
 
 # extractNum - Extracts numerical part from tutorial group
 def extractNum(group):
@@ -81,6 +92,8 @@ def schoolAffiliation(studentList):
 
 # exportData
 
+# criteriaChecker
+
 # mainProcess
 def mainProcess(pathToFile, studentsList, sortedStudentsList):
 
@@ -97,16 +110,22 @@ def mainProcess(pathToFile, studentsList, sortedStudentsList):
     for num in range(totalGroups):
 
         currentList = []
+        count = 0
 
         for item in sortedStudents:
-            if int(item['Tutorial Group'].split('-')[1]) == num+1:
+            if int(item['Tutorial Group'].split('-')[1]) == num+1 and num == 0:
+                count += 1
                 currentList.append(item)
-            
-        male_list,female_list=genderSplit(currentList)
-        
-        newStudentList = schoolAffiliation(currentList)                 # List with the school frequency in descending order
+
+        print(count)
         # Current List has 50 students from a tutorial group
-        #print(currentList)
+        printList(currentList)
+
+        break
+            
+        #male_list,female_list=genderSplit(currentList)
+        
+        #newStudentList = schoolAffiliation(currentList)                 # List with the school frequency in descending order
         
         # Step 5 - Split by gender
         
