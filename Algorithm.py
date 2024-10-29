@@ -189,6 +189,29 @@ def getGroupSize():
         except Exception as e:
             print(f"Error: Unexpected error - [{e}]")
 
+def nishaschoolAffiliation(male_list, female_list):
+    # dictionary lists
+    # Example:
+    #     male_schools = males:  {
+    #       'CCDS': [{'Tutorial Group': 'G-1', 'Student ID': '5002', 'School': 'CCDS', 'Name': 'Aarav Singh', 'Gender': 'Male', 'CGPA': '4.02'}, {'Tutorial Group': 'G-1', 'Student ID': '235', 'School': 'CCDS', 'Name': 'Ming Zhang', 'Gender': 'Male', 'CGPA': '4.06'}], 
+    #       'EEE': [{'Tutorial Group': 'G-1', 'Student ID': '3628', 'School': 'EEE', 'Name': 'Omer Ahmed', 'Gender': 'Male', 'CGPA': '4.06'}] 
+    #       }
+    male_schools = {}
+    female_schools = {}
+
+    # Adds the list of male/female student into dictionary based on their school
+    for male in male_list:
+        school = male["School"]
+        if school not in male_schools:
+            male_schools[school] = []
+        male_schools[school].append(male)
+    for female in female_list:
+        school = female["School"]
+        if school not in female_schools:
+            female_schools[school] = []
+        female_schools[school].append(female)
+
+    return male_schools, female_schools
 
 # criteriaChecker
 #def criteriaChecker():
@@ -222,10 +245,20 @@ def mainProcess(pathToFile, studentsList, sortedStudentsList):
         # Current List has 50 students from a tutorial group
         #printList(currentList)
             
-        #male_list,female_list=genderSplit(currentList)
+        # Step 6 - Split by gender
+        male_list,female_list=genderSplit(currentList)
         
-        # Step 6 - List with the school frequency in descending order
-        newStudentList = schoolAffiliation(currentList)                 
+        # Step 7 - List with the school frequency in descending order
+        malesStudentList = schoolAffiliation(male_list)
+        femalesStudentList = schoolAffiliation(female_list)   
+
+        #male_schools, female_schools = nishaschoolAffiliation(male_list,female_list)
+        #printList(male_schools)
+        #printList(female_schools)  
+
+        printList(malesStudentList)
+        printList(femalesStudentList)    
+        break          
         
         # Print in table format
         #printList(newStudentList)
