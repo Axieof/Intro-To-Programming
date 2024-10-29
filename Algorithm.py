@@ -14,7 +14,7 @@ import tabulate
 # ======================
 Students = []
 sortedStudents = []
-pathToFile = '../records.csv'
+pathToFile = '/records.csv'
 
 # ======================
 # Functions
