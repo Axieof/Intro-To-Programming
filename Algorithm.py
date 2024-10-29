@@ -92,7 +92,30 @@ def schoolAffiliation(studentList):
 
 # exportData
 
+# getGroupSize
+def getGroupSize():
+    groupBool = True
+
+    while groupBool:
+        try:
+            studentsPerGroup = input("Please enter the number of students per group (4-10)")
+            
+            studentsInt = int(studentsPerGroup)
+
+            if 4<= studentsInt <= 10:
+                groupBool = False
+                return studentsInt
+            else:
+                print("Error: Group size must be between 4 and 10")
+
+        except ValueError:
+            print("Error: Please enter a number")
+        except Exception as e:
+            print(f"Error: Unexpected error - [{e}]")
+
+
 # criteriaChecker
+#def criteriaChecker():
 
 # mainProcess
 def mainProcess(pathToFile, studentsList, sortedStudentsList):
@@ -106,7 +129,10 @@ def mainProcess(pathToFile, studentsList, sortedStudentsList):
     # Step 3 - Get total number of tutorial groups
     totalGroups = getLastGroup(sortedStudents)
 
-    # Step 4 - 
+    # Step 4 - Ask for number of students per group (additional requirements)
+    studentsNum = getGroupSize
+
+    # Step 5 - Loop all tutorial groups
     for num in range(totalGroups):
 
         currentList = []
@@ -117,17 +143,19 @@ def mainProcess(pathToFile, studentsList, sortedStudentsList):
                 count += 1
                 currentList.append(item)
 
-        print(count)
         # Current List has 50 students from a tutorial group
-        printList(currentList)
-
-        break
+        #printList(currentList)
             
         #male_list,female_list=genderSplit(currentList)
         
-        #newStudentList = schoolAffiliation(currentList)                 # List with the school frequency in descending order
+        # Step 6 - List with the school frequency in descending order
+        newStudentList = schoolAffiliation(currentList)                 
         
-        # Step 5 - Split by gender
+        # Print in table format
+        #printList(newStudentList)
+
+        # Step 7 - Allocate into groups
+        
         
 
         
