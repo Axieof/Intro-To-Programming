@@ -87,6 +87,82 @@ def schoolAffiliation(studentList):
                 
     return newStudentList
     
+# createGroups - Assign groupings, going back and forth between male and females, while ensuring school diversity
+def createGroups(male_schools, female_schools, group_size=5):
+    groups = [] # final groupings
+        
+    # Determine the number of males and females to add based on their availability and group size
+    total_males = sum(len(students) for students in male_schools.values())
+    total_females = sum(len(students) for students in female_schools.values())
+
+    if total_females > total_males:
+        max_females = (group_size + 1) // 2 
+        max_males = group_size - max_females
+    else:
+        max_males = (group_size + 1) // 2 
+        max_females = group_size - max_males
+    
+    # While there are students left in bucket
+    while any(male_schools.values()) or any(female_schools.values()):
+        # Reset create_group and count for next iteration
+        create_group = [] # temp group
+        male_count, female_count = 0, 0
+        temp_males, temp_females = [], []  # Track students to remove on success
+        
+        while len(create_group) < group_size:
+            added = False
+
+            if male_count < max_males:
+                # For male
+                # Check before assigning group: 1. number of males in group matches calculated availability, 2. ensures no more than 1 from same school
+                for school, male in male_schools.items():
+                    if male and not any(s['School'] == school for s in create_group):
+                        # Removes the student being added to group from the bucket of students
+                        male_to_add = male[0]
+                        create_group.append(male_to_add)
+                        temp_males.append((school,male_to_add))  # Mark for removal on success
+                        male_count += 1
+                        added = True
+                        break
+
+            elif female_count < max_females:
+                # Repeat for female
+                for school, female in female_schools.items():
+                    if female and not any(s['School'] == school for s in create_group):
+                        female_to_add = female[0]
+                        create_group.append(female_to_add)
+                        temp_females.append((school,female_to_add)) 
+                        female_count += 1
+                        added = True
+                        break
+
+            # If neither a male nor female could be added, switch turns and try again
+            if not added:
+                break
+        
+        # Only remove students if the group is fully formed, else exit if can't fill a complete group
+        if len(create_group) == group_size:
+            for school, male in temp_males:
+                male_schools[school].pop(0)
+            for school, female in temp_females:
+                female_schools[school].pop(0)
+            groups.append(create_group)
+        else:
+            break
+
+    # Add leftover students in groups if (50 % group_size != 0)
+    leftovers = []
+    for school, male_list in male_schools.items():
+        leftovers.extend(male_list)
+    for school, female_list in female_schools.items():
+        leftovers.extend(female_list)
+
+    while leftovers:
+        groups.append(leftovers[:group_size])
+        leftovers = leftovers[group_size:]
+
+    
+    return groups
                         
 # currentCGPA
 
