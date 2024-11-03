@@ -14,7 +14,7 @@ import tabulate
 # ======================
 Students = []
 sortedStudents = []
-pathToFile = '/records.csv'
+pathToFile = '../records.csv'
 
 # ======================
 # Functions
@@ -62,8 +62,32 @@ def genderSplit(studentlist):
             female_list.append(student)
     return male_list, female_list
 
+def schoolAffiliation(male_list, female_list):
+    # dictionary lists
+    # Example:
+    #     male_schools = males:  {
+    #       'CCDS': [{'Tutorial Group': 'G-1', 'Student ID': '5002', 'School': 'CCDS', 'Name': 'Aarav Singh', 'Gender': 'Male', 'CGPA': '4.02'}, {'Tutorial Group': 'G-1', 'Student ID': '235', 'School': 'CCDS', 'Name': 'Ming Zhang', 'Gender': 'Male', 'CGPA': '4.06'}], 
+    #       'EEE': [{'Tutorial Group': 'G-1', 'Student ID': '3628', 'School': 'EEE', 'Name': 'Omer Ahmed', 'Gender': 'Male', 'CGPA': '4.06'}] 
+    #       }
+    male_schools = {}
+    female_schools = {}
+
+    # Adds the list of male/female student into dictionary based on their school
+    for male in male_list:
+        school = male["School"]
+        if school not in male_schools:
+            male_schools[school] = []
+        male_schools[school].append(male)
+    for female in female_list:
+        school = female["School"]
+        if school not in female_schools:
+            female_schools[school] = []
+        female_schools[school].append(female)
+
+    return male_schools, female_schools
+
 # schoolAffiliation
-def schoolAffiliation(studentList):
+def oldSchoolAffiliation(studentList):
     schoolCount = {}
     for student in studentList:
         school = student['School']
@@ -189,29 +213,6 @@ def getGroupSize():
         except Exception as e:
             print(f"Error: Unexpected error - [{e}]")
 
-def nishaschoolAffiliation(male_list, female_list):
-    # dictionary lists
-    # Example:
-    #     male_schools = males:  {
-    #       'CCDS': [{'Tutorial Group': 'G-1', 'Student ID': '5002', 'School': 'CCDS', 'Name': 'Aarav Singh', 'Gender': 'Male', 'CGPA': '4.02'}, {'Tutorial Group': 'G-1', 'Student ID': '235', 'School': 'CCDS', 'Name': 'Ming Zhang', 'Gender': 'Male', 'CGPA': '4.06'}], 
-    #       'EEE': [{'Tutorial Group': 'G-1', 'Student ID': '3628', 'School': 'EEE', 'Name': 'Omer Ahmed', 'Gender': 'Male', 'CGPA': '4.06'}] 
-    #       }
-    male_schools = {}
-    female_schools = {}
-
-    # Adds the list of male/female student into dictionary based on their school
-    for male in male_list:
-        school = male["School"]
-        if school not in male_schools:
-            male_schools[school] = []
-        male_schools[school].append(male)
-    for female in female_list:
-        school = female["School"]
-        if school not in female_schools:
-            female_schools[school] = []
-        female_schools[school].append(female)
-
-    return male_schools, female_schools
 
 # criteriaChecker
 #def criteriaChecker():
@@ -246,24 +247,21 @@ def mainProcess(pathToFile, studentsList, sortedStudentsList):
         #printList(currentList)
             
         # Step 6 - Split by gender
-        male_list,female_list=genderSplit(currentList)
+        male_list,female_list = genderSplit(currentList)
         
-        # Step 7 - List with the school frequency in descending order
-        malesStudentList = schoolAffiliation(male_list)
-        femalesStudentList = schoolAffiliation(female_list)   
+        # Step 7 - Sort the genders by their schools
+        male_schools, female_schools = schoolAffiliation(male_list,female_list)
 
-        #male_schools, female_schools = nishaschoolAffiliation(male_list,female_list)
-        #printList(male_schools)
-        #printList(female_schools)  
+        # Step 8 - 
+        groups = createGroups(male_schools, female_schools)
+        for i, group in enumerate(groups, start=1):
+            print(f"Group {i}:")
+            for student in group:
+                print(f"{student['Name']} from {student['School']} ({student['Gender']})")
 
-        printList(malesStudentList)
-        printList(femalesStudentList)    
         break          
-        
-        # Print in table format
-        #printList(newStudentList)
 
-        # Step 7 - Allocate into groups
+        # Step 9
         
         
 
