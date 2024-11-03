@@ -15,6 +15,7 @@ import tabulate
 Students = []
 sortedStudents = []
 pathToFile = '../records.csv'
+pathToOutput = './FCEC_3_Pritheev.csv'
 
 # ======================
 # Functions
@@ -213,6 +214,22 @@ def getGroupSize():
         except Exception as e:
             print(f"Error: Unexpected error - [{e}]")
 
+# exportCSV
+def exportCSV(groups):
+    with open(pathToOutput, mode='a', newline='', encoding='utf-8') as csv_file:
+        fieldnames = ["Tutorial Group","Student ID", "School", "Name", "Gender", "CGPA", "Assigned Team"]
+        writer = csv.DictWriter(csv_file, fieldnames=fieldnames)
+
+        csv_file.seek(0, 2)
+        if csv_file.tell() == 0:
+            writer.writeheader()
+
+        for i, group in enumerate(groups, start=1):
+                print(f"Group {i}:")
+                for student in group:
+                    print(f"{student['Name']} from {student['School']} ({student['Gender']})")
+                    student['Assigned Team'] = i
+                    writer.writerow(student)
 
 # criteriaChecker
 #def criteriaChecker():
@@ -254,10 +271,8 @@ def mainProcess(pathToFile, studentsList, sortedStudentsList):
 
         # Step 8 - 
         groups = createGroups(male_schools, female_schools)
-        for i, group in enumerate(groups, start=1):
-            print(f"Group {i}:")
-            for student in group:
-                print(f"{student['Name']} from {student['School']} ({student['Gender']})")
+        
+        exportCSV(groups)
 
         break          
 
