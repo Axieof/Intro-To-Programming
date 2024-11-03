@@ -212,7 +212,7 @@ def getGroupSize():
 
 # exportCSV
 def exportCSV(groups):
-    with open(pathToOutput, mode='a', newline='', encoding='utf-8') as csv_file:
+    with open(pathToOutput, mode='w', newline='', encoding='utf-8') as csv_file:
         fieldnames = ["Tutorial Group","Student ID", "School", "Name", "Gender", "CGPA", "Assigned Team"]
         writer = csv.DictWriter(csv_file, fieldnames=fieldnames)
 
