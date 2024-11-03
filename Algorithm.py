@@ -188,10 +188,6 @@ def createGroups(male_schools, female_schools, group_size=5):
 
     
     return groups
-                        
-# currentCGPA
-
-# exportData
 
 # getGroupSize
 def getGroupSize():
@@ -232,7 +228,9 @@ def exportCSV(groups):
                     writer.writerow(student)
 
 # criteriaChecker
-#def criteriaChecker():
+def criteriaChecker(filename, storeList):
+
+    loadData(filename, storeList)
 
 # mainProcess
 def mainProcess(pathToFile, studentsList, sortedStudentsList):
@@ -274,10 +272,12 @@ def mainProcess(pathToFile, studentsList, sortedStudentsList):
         
         exportCSV(groups)
 
-        break          
-
         # Step 9
-        
+        criteriaList = []
+        criteriaChecker(pathToOutput, criteriaList)
+        printList(criteriaList)
+
+        break  
         
 
         
