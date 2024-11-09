@@ -111,9 +111,41 @@ def oldSchoolAffiliation(studentList):
                 newStudentList.append(student)
                 
     return newStudentList
-    
+
+# calculateOptimalDistribution
+def calculateOptimalDistribution(male_list, female_list, studentsNum):
+    numStudents = 50  # Assuming each tutorial group has 50 students
+    numTeams = numStudents // studentsNum
+    remainder = numStudents % studentsNum
+
+    if remainder > 0:
+        normalTeams = numTeams - remainder
+        remainingTeams = remainder
+        print(f"Creating {normalTeams} teams of {studentsNum} and {remainingTeams} teams of {studentsNum + 1}")
+    else:
+        normalTeams = numTeams
+        remainingTeams = 0
+        print(f"Creating {normalTeams} teams of {studentsNum}")
+
+    totalMales = len(male_list)
+    totalFemales = len(female_list)
+
+    team_gender_template = []
+    for i in range(normalTeams):
+        male_count = min(totalMales // normalTeams, studentsNum // 2 + (studentsNum % 2))
+        female_count = studentsNum - male_count
+        team_gender_template.append((male_count, female_count))
+
+    for i in range(remainingTeams):
+        male_count = min(totalMales // remainingTeams, (studentsNum + 1) // 2 + ((studentsNum + 1) % 2))
+        female_count = (studentsNum + 1) - male_count
+        team_gender_template.append((male_count, female_count))
+
+    print("Optimal gender distribution per team (M,F):", team_gender_template)
+    return team_gender_template
+
 # createGroups - Assign groupings, going back and forth between male and females, while ensuring school diversity
-def createGroups(male_schools, female_schools, group_size=5):
+def createGroups(male_schools, female_schools, group_size):
     groups = [] # final groupings
         
     # Determine the number of males and females to add based on their availability and group size
@@ -186,6 +218,7 @@ def createGroups(male_schools, female_schools, group_size=5):
         groups.append(leftovers[:group_size])
         leftovers = leftovers[group_size:]
 
+    #groups = criteriaChecker(groups, max_females, max_males)
     
     return groups
 
@@ -212,7 +245,7 @@ def getGroupSize():
 
 # exportCSV
 def exportCSV(groups):
-    with open(pathToOutput, mode='w', newline='', encoding='utf-8') as csv_file:
+    with open(pathToOutput, mode='a', newline='', encoding='utf-8') as csv_file:
         fieldnames = ["Tutorial Group","Student ID", "School", "Name", "Gender", "CGPA", "Assigned Team"]
         writer = csv.DictWriter(csv_file, fieldnames=fieldnames)
 
@@ -221,16 +254,11 @@ def exportCSV(groups):
             writer.writeheader()
 
         for i, group in enumerate(groups, start=1):
-                print(f"Group {i}:")
+                # print(f"Group {i}:")
                 for student in group:
-                    print(f"{student['Name']} from {student['School']} ({student['Gender']})")
+                    # print(f"{student['Name']} from {student['School']} ({student['Gender']})")
                     student['Assigned Team'] = i
                     writer.writerow(student)
-
-# criteriaChecker
-def criteriaChecker(filename, storeList):
-
-    loadData(filename, storeList)
 
 # mainProcess
 def mainProcess(pathToFile, studentsList, sortedStudentsList):
@@ -245,7 +273,7 @@ def mainProcess(pathToFile, studentsList, sortedStudentsList):
     totalGroups = getLastGroup(sortedStudents)
 
     # Step 4 - Ask for number of students per group (additional requirements)
-    studentsNum = getGroupSize
+    studentsNum = getGroupSize()
 
     # Step 5 - Loop all tutorial groups
     for num in range(totalGroups):
@@ -254,7 +282,7 @@ def mainProcess(pathToFile, studentsList, sortedStudentsList):
         count = 0
 
         for item in sortedStudents:
-            if int(item['Tutorial Group'].split('-')[1]) == num+1 and num == 0:
+            if int(item['Tutorial Group'].split('-')[1]) == num+1:
                 count += 1
                 currentList.append(item)
 
@@ -267,18 +295,19 @@ def mainProcess(pathToFile, studentsList, sortedStudentsList):
         # Step 7 - Sort the genders by their schools
         male_schools, female_schools = schoolAffiliation(male_list,female_list)
 
-        # Step 8 - 
-        groups = createGroups(male_schools, female_schools)
-        
-        exportCSV(groups)
+        calculateOptimalDistribution(male_list, female_list, studentsNum)
 
-        # Step 9
-        criteriaList = []
-        criteriaChecker(pathToOutput, criteriaList)
-        printList(criteriaList)
+        # Step 8 - Assign to teams
+        groups = createGroups(male_schools, female_schools, studentsNum)
 
-        break  
-        
+        print(groups)
+
+        # Step 9 - Check that teams meet criteria
+
+        # Step 10 - Export to CSV
+        #exportCSV(groups)
+
+        break
 
         
 
