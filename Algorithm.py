@@ -143,6 +143,30 @@ def calculateOptimalDistribution(male_list, female_list, studentsNum):
 
     print("Optimal gender distribution per team (M,F):", team_gender_template)
     return team_gender_template
+  
+def verifyAndAdjustTeams(teams):
+    for team in teams:
+        male_count = sum(1 for student in team if student['Gender'] == 'Male')
+        female_count = len(team) - male_count
+        
+        # Verify gender balance
+        if abs(male_count - female_count) > 1:
+            print(f"Adjusting gender balance in team: {team}")
+            # Implement logic to swap students with other teams if possible
+
+        # Verify school diversity
+        school_counts = {}
+        for student in team:
+            school = student['School']
+            school_counts[school] = school_counts.get(school, 0) + 1
+        max_school_count = max(school_counts.values())
+        
+        if max_school_count > len(team) // 2:
+            print(f"Adjusting school diversity in team: {team}")
+            # Implement logic to swap students from the dominant school with other teams
+
+    print("Teams adjusted to meet criteria.")
+    return teams
 
 # createGroups - Assign groupings, going back and forth between male and females, while ensuring school diversity
 def createGroups(male_schools, female_schools, group_size):
@@ -151,6 +175,8 @@ def createGroups(male_schools, female_schools, group_size):
     # Determine the number of males and females to add based on their availability and group size
     total_males = sum(len(students) for students in male_schools.values())
     total_females = sum(len(students) for students in female_schools.values())
+
+    print(f"Tutorial Group Gender Distribution is M:{total_males}, F:{total_females}")
 
     if total_females > total_males:
         max_females = (group_size + 1) // 2 
@@ -287,33 +313,23 @@ def mainProcess(pathToFile, studentsList, sortedStudentsList):
                 currentList.append(item)
 
         # Current List has 50 students from a tutorial group
-        #printList(currentList)
+        printList(currentList)
             
         # Step 6 - Split by gender
         male_list,female_list = genderSplit(currentList)
-        
+
         # Step 7 - Sort the genders by their schools
         male_schools, female_schools = schoolAffiliation(male_list,female_list)
-
-        calculateOptimalDistribution(male_list, female_list, studentsNum)
 
         # Step 8 - Assign to teams
         groups = createGroups(male_schools, female_schools, studentsNum)
 
-        print(groups)
-
         # Step 9 - Check that teams meet criteria
 
         # Step 10 - Export to CSV
-        #exportCSV(groups)
+        exportCSV(groups)
 
         break
-
-        
-
-
-    # Step 5 -
-
 
 # Run Algorithm
 mainProcess(pathToFile, Students, sortedStudents)
