@@ -113,7 +113,7 @@ def oldSchoolAffiliation(studentList):
     return newStudentList
 
 # calculateOptimalDistribution
-def calculateOptimalDistribution(male_list, female_list, studentsNum):
+def calculateOptimalDistribution(male_total, female_total, studentsNum):
     numStudents = 50  # Assuming each tutorial group has 50 students
     numTeams = numStudents // studentsNum
     remainder = numStudents % studentsNum
@@ -127,8 +127,8 @@ def calculateOptimalDistribution(male_list, female_list, studentsNum):
         remainingTeams = 0
         print(f"Creating {normalTeams} teams of {studentsNum}")
 
-    totalMales = len(male_list)
-    totalFemales = len(female_list)
+    totalMales = male_total
+    totalFemales = female_total
 
     team_gender_template = []
     for i in range(normalTeams):
@@ -178,6 +178,43 @@ def createGroups(male_schools, female_schools, group_size):
 
     print(f"Tutorial Group Gender Distribution is M:{total_males}, F:{total_females}")
 
+    teamGenderTemplate = calculateOptimalDistribution(total_males, total_females, group_size)
+
+    while any(male_schools.values()) or any(female_schools.values()):
+        for male_count, female_count in teamGenderTemplate:
+            create_group = [] # Temporary group for the current team
+            temp_males, temp_females = [], []
+
+            for _ in range(male_count):
+                if any(male_schools.values()):
+                    for school, males in male_schools.items():
+                        if males and not any(s['School'] == school for s in create_group):
+                            male_to_add = males.pop(0)
+                            create_group.append(male_to_add)
+                            temp_males.append((school, male_to_add))
+                            break
+
+            for _ in range(female_count):
+                if any(female_schools.values()):
+                    for school, females in female_schools.items():
+                        if females and not any(s['School'] == school for s in create_group):
+                            female_to_add = females.pop(0)
+                            create_group.append(female_to_add)
+                            temp_females.append((school, female_to_add))
+                            break
+
+            if len(create_group) == male_count + female_count:
+                groups.append(create_group)
+                for item in groups:
+                    printList(item)
+            else:
+                for school, student in temp_males:
+                    male_schools[school].insert(0, student)
+                for school, student in temp_females:
+                    female_schools[school].insert(0, student)
+                break
+
+    """
     if total_females > total_males:
         max_females = (group_size + 1) // 2 
         max_males = group_size - max_females
@@ -232,19 +269,18 @@ def createGroups(male_schools, female_schools, group_size):
             groups.append(create_group)
         else:
             break
+    """
 
     # Add leftover students in groups if (50 % group_size != 0)
     leftovers = []
-    for school, male_list in male_schools.items():
-        leftovers.extend(male_list)
-    for school, female_list in female_schools.items():
-        leftovers.extend(female_list)
+    for school, males in male_schools.items():
+        leftovers.extend(males)
+    for school, females in female_schools.items():
+        leftovers.extend(females)
 
     while leftovers:
         groups.append(leftovers[:group_size])
         leftovers = leftovers[group_size:]
-
-    #groups = criteriaChecker(groups, max_females, max_males)
     
     return groups
 
@@ -327,7 +363,7 @@ def mainProcess(pathToFile, studentsList, sortedStudentsList):
         # Step 9 - Check that teams meet criteria
 
         # Step 10 - Export to CSV
-        exportCSV(groups)
+        #exportCSV(groups)
 
         break
 
