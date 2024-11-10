@@ -112,6 +112,42 @@ def oldSchoolAffiliation(studentList):
                 
     return newStudentList
 
+def schoolChecker(male_schools, female_schools, group_size, total_students=50):
+    """
+    Determines the maximum number of students from each school that can be placed in each team.
+    Prints the total count per school and the calculated distribution.
+    """
+    school_distribution = {}
+
+    # Combine male and female students by school
+    for school, students in male_schools.items():
+        school_distribution[school] = school_distribution.get(school, 0) + len(students)
+    for school, students in female_schools.items():
+        school_distribution[school] = school_distribution.get(school, 0) + len(students)
+
+    # Calculate maximum allowed students per school in each team
+    max_students_per_school = {}
+    num_teams = total_students // group_size
+
+    print("Total students per school:")
+    for school, count in school_distribution.items():
+        print(f" - {school}: {count} students")
+        
+        # Calculate base allocation per team and distribute any remainder
+        if count <= num_teams:
+            # If fewer students than teams, assign 1 per team
+            max_students_per_school[school] = (1, 0)
+        else:
+            max_per_team = count // num_teams
+            leftover = count % num_teams  # Leftover students to be distributed
+            max_students_per_school[school] = (max_per_team, leftover)
+
+    print("\nMax students per school per team (max per team, leftovers):")
+    for school, allocation in max_students_per_school.items():
+        print(f" - {school}: {allocation}")
+
+    return max_students_per_school
+
 # calculateOptimalDistribution
 def calculateOptimalDistribution(total_males, total_females, group_size):
     num_students = 50  # Total number of students per tutorial group
@@ -122,7 +158,7 @@ def calculateOptimalDistribution(total_males, total_females, group_size):
     normalTeams = num_teams - remainder
     remainingTeams = remainder
 
-    print(f"Creating {normalTeams} teams of {group_size} and {remainingTeams} teams of {group_size + 1}")
+    #print(f"Creating {normalTeams} teams of {group_size} and {remainingTeams} teams of {group_size + 1}")
 
     # Initialize variables for gender distribution and remaining counts
     team_gender_template = []
@@ -201,93 +237,78 @@ def verifyAndAdjustTeams(teams):
 
 # createGroups - Assign groupings, going back and forth between male and females, while ensuring school diversity
 def createGroups(male_schools, female_schools, group_size):
+    # Use schoolChecker to determine max per school per team
+    max_per_school = schoolChecker(male_schools, female_schools, group_size)
+
     groups = []  # Final list of groups
 
-    # Determine total number of males and females
-    total_males = sum(len(students) for students in male_schools.values())
-    total_females = sum(len(students) for students in female_schools.values())
-
-    print(f"Tutorial Group Gender Distribution is M:{total_males}, F:{total_females}")
+    # Flatten male and female students into lists for easier access
+    male_students = [student for students in male_schools.values() for student in students]
+    female_students = [student for students in female_schools.values() for student in students]
 
     # Get the optimal gender distribution per team
-    teamGenderTemplate = calculateOptimalDistribution(total_males, total_females, group_size)
+    teamGenderTemplate = calculateOptimalDistribution(len(male_students), len(female_students), group_size)
+    
+    # Initialize counts for schools in each team
+    school_counts = {school: 0 for school in max_per_school.keys()}
     
     # Create main groups based on the template
     for male_count, female_count in teamGenderTemplate:
         create_group = []  # Temporary group for the current team
-        temp_males, temp_females = [], []  # Track students added to the team
+        group_school_counts = {}  # Track school counts in the current group
 
-        # Try to add males according to the male count, prioritizing gender distribution
+        # Add the exact number of males specified by `male_count`
         for _ in range(male_count):
-            if any(male_schools.values()):
-                added = False
-                # First attempt: Enforce one-student-per-school
-                for school, males in male_schools.items():
-                    if males and not any(s['School'] == school for s in create_group):
-                        male_to_add = males.pop(0)
-                        create_group.append(male_to_add)
-                        temp_males.append((school, male_to_add))
-                        added = True
-                        break
-                
-                # If unable to meet gender requirement due to school constraint, relax the constraint
-                if not added:
-                    for school, males in male_schools.items():
-                        if males:
-                            male_to_add = males.pop(0)
-                            create_group.append(male_to_add)
-                            temp_males.append((school, male_to_add))
-                            break
+            added = False
+            for student in male_students:
+                school = student['School']
+                # Ensure school count for this group doesn’t exceed max constraint
+                if group_school_counts.get(school, 0) < max_per_school[school][0] or \
+                   (max_per_school[school][1] > 0 and school_counts[school] < group_size + 1):
+                    create_group.append(student)
+                    male_students.remove(student)
+                    group_school_counts[school] = group_school_counts.get(school, 0) + 1
+                    school_counts[school] += 1
+                    added = True
+                    break
 
-        # Try to add females according to the female count, prioritizing gender distribution
+            # Relax the constraint if no valid student was found
+            if not added:
+                if male_students:
+                    create_group.append(male_students.pop(0))
+
+        # Add the exact number of females specified by `female_count`
         for _ in range(female_count):
-            if any(female_schools.values()):
-                added = False
-                # First attempt: Enforce one-student-per-school
-                for school, females in female_schools.items():
-                    if females and not any(s['School'] == school for s in create_group):
-                        female_to_add = females.pop(0)
-                        create_group.append(female_to_add)
-                        temp_females.append((school, female_to_add))
-                        added = True
-                        break
-                
-                # If unable to meet gender requirement due to school constraint, relax the constraint
-                if not added:
-                    for school, females in female_schools.items():
-                        if females:
-                            female_to_add = females.pop(0)
-                            create_group.append(female_to_add)
-                            temp_females.append((school, female_to_add))
-                            break
+            added = False
+            for student in female_students:
+                school = student['School']
+                # Ensure school count for this group doesn’t exceed max constraint
+                if group_school_counts.get(school, 0) < max_per_school[school][0] or \
+                   (max_per_school[school][1] > 0 and school_counts[school] < group_size + 1):
+                    create_group.append(student)
+                    female_students.remove(student)
+                    group_school_counts[school] = group_school_counts.get(school, 0) + 1
+                    school_counts[school] += 1
+                    added = True
+                    break
 
-        # Verify if the group meets the required size from the gender template
-        if len(create_group) == male_count + female_count:
-            groups.append(create_group)
-        else:
-            # Roll back added students if group was incomplete
-            for school, student in temp_males:
-                male_schools[school].insert(0, student)
-            for school, student in temp_females:
-                female_schools[school].insert(0, student)
-            break
+            # Relax the constraint if no valid student was found
+            if not added:
+                if female_students:
+                    create_group.append(female_students.pop(0))
 
-    # Collect remaining students for final distribution
-    leftovers = []
-    for school, males in male_schools.items():
-        leftovers.extend(males)
-    for school, females in female_schools.items():
-        leftovers.extend(females)
+        # Add the completed group to the list of groups
+        groups.append(create_group)
 
-    # Distribute leftover students into existing groups to avoid creating a new group
+    # Distribute any leftover students to avoid single-student groups
+    leftovers = male_students + female_students
     for student in leftovers:
         for group in groups:
-            if len(group) < group_size + 1:  # Add only if it doesn’t exceed `group_size + 1`
+            if len(group) < group_size + 1:
                 group.append(student)
                 break
 
     return groups
-
 # getGroupSize
 def getGroupSize():
     groupBool = True
@@ -369,7 +390,8 @@ def mainProcess(pathToFile, studentsList, sortedStudentsList):
         # Step 10 - Export to CSV
         exportCSV(groups)
 
-        break
+        # Uncomment this to only do it for 1 tutorial group
+        #break
 
 # Run Algorithm
 mainProcess(pathToFile, Students, sortedStudents)
