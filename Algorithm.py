@@ -158,11 +158,10 @@ def calculateOptimalDistribution(total_males, total_females, group_size):
     normalTeams = num_teams - remainder
     remainingTeams = remainder
 
-    #print(f"Creating {normalTeams} teams of {group_size} and {remainingTeams} teams of {group_size + 1}")
-
     # Initialize variables for gender distribution and remaining counts
     team_gender_template = []
     remaining_males, remaining_females = total_males, total_females
+    total_assigned = 0  # Track total students assigned to ensure it does not exceed 50
 
     # Fill larger teams first to spread students more evenly
     for i in range(remainingTeams):
@@ -174,9 +173,14 @@ def calculateOptimalDistribution(total_males, total_females, group_size):
             female_count = min(remaining_females, (current_team_size + 1) // 2)
             male_count = current_team_size - female_count
 
+        # Ensure we do not exceed 50 students in total
+        if total_assigned + male_count + female_count > num_students:
+            break  # Stop if adding this team would exceed 50 students
+
         team_gender_template.append((male_count, female_count))
         remaining_males -= male_count
         remaining_females -= female_count
+        total_assigned += male_count + female_count
 
     # Fill remaining normal-sized teams
     for i in range(normalTeams):
@@ -188,29 +192,39 @@ def calculateOptimalDistribution(total_males, total_females, group_size):
             female_count = min(remaining_females, (current_team_size + 1) // 2)
             male_count = current_team_size - female_count
 
+        # Ensure we do not exceed 50 students in total
+        if total_assigned + male_count + female_count > num_students:
+            break  # Stop if adding this team would exceed 50 students
+
         team_gender_template.append((male_count, female_count))
         remaining_males -= male_count
         remaining_females -= female_count
+        total_assigned += male_count + female_count
 
-    # Distribute any leftover students to balance the gender distribution across all teams
+    # Distribute any remaining students only if the total is still below 50
     for i in range(len(team_gender_template)):
         if remaining_males == 0 and remaining_females == 0:
             break
         male_count, female_count = team_gender_template[i]
 
-        # Fill remaining males and females to balance across teams
-        if remaining_males > 0 and male_count < group_size // 2 + 1:
+        # Add remaining students to balance the teams while enforcing 50-student limit
+        if remaining_males > 0 and male_count < group_size // 2 + 1 and total_assigned < num_students:
             male_count += 1
             remaining_males -= 1
-        elif remaining_females > 0 and female_count < group_size // 2 + 1:
+            total_assigned += 1
+        if remaining_females > 0 and female_count < group_size // 2 + 1 and total_assigned < num_students:
             female_count += 1
             remaining_females -= 1
+            total_assigned += 1
 
         team_gender_template[i] = (male_count, female_count)
 
+        # Stop if we've reached exactly 50 students
+        if total_assigned >= num_students:
+            break
+
     print("Optimal gender distribution per team (M,F):", team_gender_template)
     return team_gender_template
-
 def verifyAndAdjustTeams(teams):
     for team in teams:
         male_count = sum(1 for student in team if student['Gender'] == 'Male')
@@ -309,6 +323,7 @@ def createGroups(male_schools, female_schools, group_size):
                 break
 
     return groups
+
 # getGroupSize
 def getGroupSize():
     groupBool = True
@@ -391,7 +406,7 @@ def mainProcess(pathToFile, studentsList, sortedStudentsList):
         exportCSV(groups)
 
         # Uncomment this to only do it for 1 tutorial group
-        #break
+        break
 
 # Run Algorithm
 mainProcess(pathToFile, Students, sortedStudents)
